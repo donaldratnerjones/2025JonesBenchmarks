@@ -120,9 +120,9 @@ function [Yconverged,Yerror] = converge(Z,X,Z0,X0,Y0,const,xopt)
     Yerror0 = inf;
     for i=1:n
         Yin = Yout;
+        % Get outputs Yout computed using coupling variables Yin
         [Yin,Yout] = my_system_analysis(Z,X,Yin,Z0,X0,Y0,const);
         Yerror = norm( real( (Yout-Yin)./Y0 ) ) ;
-        % fprintf('iter = %d, norm=%e\n', i, Yerror );
         if ~any(isnan(Yin)) && ~any(isnan(Yout))
             if Yerror < Yerror0
                 Yin0 = Yin;
