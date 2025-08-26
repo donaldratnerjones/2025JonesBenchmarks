@@ -1,5 +1,5 @@
 
-function [bjet,frelevant,grelevant,hrelevant,xl,xu,xopt] = ...
+function [bjet,frelevant,grelevant,hrelevant,xl,xu,xopt,x0] = ...
              businessjet_benchmark(UseEqualities,ScaleConstraints)
 
     load('businessjet.mat','Z0','Z_lb','Z_ub','X0','X_lb','X_ub','Y0','Y_lb','Y_ub',...
@@ -30,7 +30,9 @@ function [bjet,frelevant,grelevant,hrelevant,xl,xu,xopt] = ...
         xu        = [Z_ub,X_ub];
         xopt      = xopt(1:31);
     end
-
+    
+    x0 = [];
+    
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -136,16 +138,6 @@ function [Yconverged,Yerror] = converge(Z,X,Z0,X0,Y0,const,xopt)
         end
     end
     Yin = Yin0;
-    Yerror = Yerror0;
-    if Yerror > 1e-6
-        fun     = @(Yin) yobj(Z,X,Yin,Z0,X0,Y0,const);
-        nonlcon = @(Yin) ynonlcon(Z,X,Yin,Z0,X0,Y0,const);
-        options = optimoptions('fmincon',Display='none',Algorithm='sqp',...
-                               ConstraintTolerance=2e-16,StepTolerance=1e-16,...
-                               FiniteDifferenceType='central',MaxFunctionEvaluations=1000);
-        Yin = xopt(32:41);
-        Yin = fmincon(fun,Yin,[],[],[],[],[],[],nonlcon,options);
-    end
     [Yin,Yout] = my_system_analysis(Z,X,Yin,Z0,X0,Y0,const);
     Yconverged = real(Yin+Yout)/2;
     Yerror = norm( real( (Yout-Yin)./Y0 ) ) ;
